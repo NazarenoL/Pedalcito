@@ -39,12 +39,14 @@ const Button BUTTON_LOOPER = Button(7, PULLUP);
  */
 const byte SCREEN_BACKLIGHT_PIN = 3;
 const byte SCREEN_ADDRESS = 0x27;
+const String SCREEN_CLEAR_LINE = "                    ";
 LiquidCrystal_I2C lcd(SCREEN_ADDRESS, 2, 1, 0, 4, 5, 6, 7, SCREEN_BACKLIGHT_PIN, POSITIVE);
 
 /*
  * MIDI
  */
 MIDI_CREATE_DEFAULT_INSTANCE();
+const byte MIDI_CHANNEL = 1;
 
 /*
  * MODE
@@ -75,20 +77,21 @@ void setup() {
   doLedsSetup();
   doScreenSetup();
 
-  delay(200);
+  delay(400);
+
+  printModeName();
 }
 
 // the loop function runs over and over again forever
 void loop() {
-	digitalWrite(LEDS_PORTS[0], BUTTONS[0].isPressed());
-	digitalWrite(LEDS_PORTS[1], BUTTONS[1].isPressed());
-	digitalWrite(LEDS_PORTS[2], BUTTONS[2].isPressed());
-	digitalWrite(LEDS_PORTS[3], BUTTONS[3].isPressed());
+  digitalWrite(LEDS_PORTS[0], BUTTONS[0].isPressed());
+  digitalWrite(LEDS_PORTS[1], BUTTONS[1].isPressed());
+  digitalWrite(LEDS_PORTS[2], BUTTONS[2].isPressed());
+  digitalWrite(LEDS_PORTS[3], BUTTONS[3].isPressed());
   
-	screenLoop();
+  screenLoop();
   modeChangeLoop();
-
-  delay(100);
+  // delay(100);
 }
 
 void doLedsSetup()
@@ -110,7 +113,7 @@ void doScreenSetup()
 
   lcd.home();
   lcd.print("LaPedalera");
-  lcd.setCursor(0,2);
+  lcd.setCursor(0, 2);
   lcd.print("@nazarenol");
 }
 
@@ -119,24 +122,24 @@ void screenLoop()
   lcd.home ();
   // Do a little animation by writing to the same location
   for (int i=0; i<2; i++) {
-  	for (int j=0; j<16; j++) {
-  	 lcd.print(char(random(7)));
-  	}
+    for (int j=0; j<16; j++) {
+     lcd.print(char(random(7)));
+    }
 
-  	lcd.setCursor(0, 1);
+    lcd.setCursor(0, 1);
   }
 }
 
 void modeChangeLoop() {
   if (BUTTON_MODE_UP.uniquePress()) {
-    if (selectedMode +1 >= BUTTON_COUNT) {
+    if (selectedMode +1 >= MODES_COUNT) {
       selectedMode = 0;
     } else {
       selectedMode++;
     }
   } else if (BUTTON_MODE_DOWN.uniquePress()) {
     if (selectedMode == 0) {
-      selectedMode = BUTTON_COUNT -1;
+      selectedMode = MODES_COUNT -1;
     } else {
       selectedMode--;
     }
@@ -144,10 +147,18 @@ void modeChangeLoop() {
     return;
   }
 
-  lcd.setCursor(0,2);
-  lcd.print(MODES[selectedMode]); //Padded to 20 (screen width)
+  printModeName();
+  sendProgramChange(selectedMode);
 }
 
-void printModeName();
+void printModeName() {
+  lcd.setCursor(0, 2);
+  lcd.print(SCREEN_CLEAR_LINE);
+  lcd.setCursor(0, 2);
+  lcd.print(MODES[selectedMode]);
+}
 
+void sendProgramChange(byte program) {
+  // MIDI.sendProgramChange(program, MIDI_CHANNEL);
+}
 
