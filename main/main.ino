@@ -154,6 +154,7 @@ void modeChangeLoop() {
 
   printModeName();
   sendProgramChange(selectedMode);
+  delay(10);
 }
 
 void stompSwitchesLoop() {
@@ -161,11 +162,10 @@ void stompSwitchesLoop() {
   for (int i=0; i <= 4; i++){
     if (BUTTONS[i].uniquePress()) {
       buttonToggled[i] = !buttonToggled[i];
-
+      digitalWrite(LEDS_PORTS[i], buttonToggled[i]);
       MIDI.sendNoteOn(i, buttonToggled[i] ? NOTE_VELOCITY_ON : NOTE_VELOCITY_OFF, MIDI_CHANNEL);
+      delay(10); //UGLY-HACK-1: as TX is reused as DIG1, without this I will count the midi message as a press
     }
-
-    digitalWrite(LEDS_PORTS[i], buttonToggled[i]);
   }
 
 
