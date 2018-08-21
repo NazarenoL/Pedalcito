@@ -85,10 +85,9 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-  digitalWrite(LEDS_PORTS[0], BUTTONS[0].isPressed());
-  digitalWrite(LEDS_PORTS[1], BUTTONS[1].isPressed());
-  digitalWrite(LEDS_PORTS[2], BUTTONS[2].isPressed());
-  digitalWrite(LEDS_PORTS[3], BUTTONS[3].isPressed());
+  for (int i=0; i <= 4; i++){
+    digitalWrite(LEDS_PORTS[i], BUTTONS[i].isPressed());
+  }
   
   screenLoop();
   modeChangeLoop();
