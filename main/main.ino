@@ -41,6 +41,7 @@ const byte SCREEN_BACKLIGHT_PIN = 3;
 const byte SCREEN_ADDRESS = 0x27;
 const String SCREEN_CLEAR_LINE = "                    ";
 LiquidCrystal_I2C lcd(SCREEN_ADDRESS, 2, 1, 0, 4, 5, 6, 7, SCREEN_BACKLIGHT_PIN, POSITIVE);
+unsigned long lastRefreshTimeMs = millis();
 
 /*
  * MIDI
@@ -91,7 +92,7 @@ void loop() {
   
   screenLoop();
   modeChangeLoop();
-  // delay(100);
+  delay(50);
 }
 
 void doLedsSetup()
@@ -121,12 +122,16 @@ void screenLoop()
 {
   lcd.home ();
   // Do a little animation by writing to the same location
-  for (int i=0; i<2; i++) {
-    for (int j=0; j<16; j++) {
-     lcd.print(char(random(7)));
-    }
+  if (millis() - lastRefreshTimeMs > 200) {
+    lastRefreshTimeMs = millis();
 
-    lcd.setCursor(0, 1);
+    for (int i=0; i<2; i++) {
+      for (int j=0; j<16; j++) {
+       lcd.print(char(random(7)));
+      }
+
+      lcd.setCursor(0, 1);
+    }
   }
 }
 
@@ -159,6 +164,6 @@ void printModeName() {
 }
 
 void sendProgramChange(byte program) {
-  // MIDI.sendProgramChange(program, MIDI_CHANNEL);
+  MIDI.sendProgramChange(program, MIDI_CHANNEL);
 }
 
