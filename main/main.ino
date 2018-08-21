@@ -31,8 +31,8 @@ boolean buttonToggled[] = {false, false, false, false, false};
 /*
  * Other buttons
  */
-const Button BUTTON_MODE_UP = Button(5, PULLUP);
-const Button BUTTON_MODE_DOWN = Button(6, PULLUP);
+const Button BUTTON_MODE_DOWN = Button(5, PULLUP);
+const Button BUTTON_MODE_UP = Button(6, PULLUP);
 const Button BUTTON_LOOPER = Button(7, PULLUP);
 
 /*
@@ -49,6 +49,9 @@ unsigned long lastRefreshTimeMs = millis();
  */
 MIDI_CREATE_DEFAULT_INSTANCE();
 const byte MIDI_CHANNEL = 1;
+const byte NOTE_VELOCITY_ON = 127;
+const byte NOTE_VELOCITY_OFF = 0;
+
 
 /*
  * MODE
@@ -158,6 +161,8 @@ void stompSwitchesLoop() {
   for (int i=0; i <= 4; i++){
     if (BUTTONS[i].uniquePress()) {
       buttonToggled[i] = !buttonToggled[i];
+
+      MIDI.sendNoteOn(i, buttonToggled[i] ? NOTE_VELOCITY_ON : NOTE_VELOCITY_OFF, MIDI_CHANNEL);
     }
 
     digitalWrite(LEDS_PORTS[i], buttonToggled[i]);
