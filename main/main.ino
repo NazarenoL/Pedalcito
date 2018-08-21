@@ -26,6 +26,7 @@ const Button BUTTONS[] = {
 };
 const byte LEDS_PORTS[] = {8, 9, 10, 11, 12}; // TODO: The led 12 does not really exist ATM
 const byte BUTTON_COUNT = 5;
+boolean buttonToggled[] = {false, false, false, false, false};
 
 /*
  * Other buttons
@@ -85,12 +86,9 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-  for (int i=0; i <= 4; i++){
-    digitalWrite(LEDS_PORTS[i], BUTTONS[i].isPressed());
-  }
-  
   screenLoop();
   modeChangeLoop();
+  stompSwitchesLoop();
   delay(50);
 }
 
@@ -153,6 +151,19 @@ void modeChangeLoop() {
 
   printModeName();
   sendProgramChange(selectedMode);
+}
+
+void stompSwitchesLoop() {
+  // Turn on the LED accordingly
+  for (int i=0; i <= 4; i++){
+    if (BUTTONS[i].uniquePress()) {
+      buttonToggled[i] = !buttonToggled[i];
+    }
+
+    digitalWrite(LEDS_PORTS[i], buttonToggled[i]);
+  }
+
+
 }
 
 void printModeName() {
