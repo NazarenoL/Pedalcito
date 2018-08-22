@@ -178,5 +178,10 @@ void printModeName() {
 
 void sendProgramChange(byte program) {
   MIDI.sendProgramChange(program, MIDI_CHANNEL);
+
+  for (int i=0; i <= 4; i++){
+    buttonToggled[i] = false;
+    digitalWrite(LEDS_PORTS[i], false);
+  }
 }
 
