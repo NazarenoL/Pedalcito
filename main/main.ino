@@ -19,7 +19,7 @@
  */
 const Button BUTTONS[] = {
   Button(0, PULLUP),
-  Button(1, PULLUP),
+  Button(A0, PULLUP),
   Button(2, PULLUP),
   Button(3, PULLUP),
   Button(4, PULLUP)
@@ -49,8 +49,7 @@ unsigned long lastRefreshTimeMs = millis();
  */
 MIDI_CREATE_DEFAULT_INSTANCE();
 const byte MIDI_CHANNEL = 1;
-const byte NOTE_VELOCITY_ON = 127;
-const byte NOTE_VELOCITY_OFF = 0;
+const byte STOMP_BUTTON_CC_NUMBER = 20;
 
 
 /*
@@ -82,7 +81,7 @@ void setup() {
   doLedsSetup();
   doScreenSetup();
 
-  delay(400);
+  delay(800);
 
   printModeName();
 }
@@ -113,7 +112,7 @@ void doScreenSetup()
   }
 
   lcd.home();
-  lcd.print("LaPedalera");
+  lcd.print("PEDALCITO!");
   lcd.setCursor(0, 2);
   lcd.print("@nazarenol");
 }
@@ -154,7 +153,6 @@ void modeChangeLoop() {
 
   printModeName();
   sendProgramChange(selectedMode);
-  delay(10);
 }
 
 void stompSwitchesLoop() {
@@ -163,8 +161,8 @@ void stompSwitchesLoop() {
     if (BUTTONS[i].uniquePress()) {
       buttonToggled[i] = !buttonToggled[i];
       digitalWrite(LEDS_PORTS[i], buttonToggled[i]);
-      MIDI.sendNoteOn(i, buttonToggled[i] ? NOTE_VELOCITY_ON : NOTE_VELOCITY_OFF, MIDI_CHANNEL);
-      delay(10); //UGLY-HACK-1: as TX is reused as DIG1, without this I will count the midi message as a press
+
+      MIDI.sendControlChange(STOMP_BUTTON_CC_NUMBER + i, buttonToggled[i] ? 0 : 127, MIDI_CHANNEL);
     }
   }
 
