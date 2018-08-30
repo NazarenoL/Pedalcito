@@ -34,6 +34,9 @@ boolean buttonToggled[] = {false, false, false, false, false};
 const Button BUTTON_MODE_DOWN = Button(5, PULLUP);
 const Button BUTTON_MODE_UP = Button(6, PULLUP);
 const Button BUTTON_LOOPER = Button(7, PULLUP);
+const byte EXPRESSION_PEDAL_PORT = A1;
+int expressionPedalValue = 0;
+byte expressionPedalLastValue = 0;
 
 /*
  * SCREEN
@@ -50,6 +53,7 @@ unsigned long lastRefreshTimeMs = millis();
 MIDI_CREATE_DEFAULT_INSTANCE();
 const byte MIDI_CHANNEL = 1;
 const byte STOMP_BUTTON_CC_NUMBER = 20;
+const byte EXPRESSION_PEDAL_CC_NUMBER = 26;
 
 
 /*
@@ -91,7 +95,8 @@ void loop() {
   screenLoop();
   modeChangeLoop();
   stompSwitchesLoop();
-  delay(50);
+  expressionPedalLoop();
+  delay(5);
 }
 
 void doLedsSetup()
@@ -165,8 +170,17 @@ void stompSwitchesLoop() {
       MIDI.sendControlChange(STOMP_BUTTON_CC_NUMBER + i, buttonToggled[i] ? 0 : 127, MIDI_CHANNEL);
     }
   }
+}
 
+void expressionPedalLoop() {
+  expressionPedalValue = analogRead(EXPRESSION_PEDAL_PORT);
+  // Convert 10 bit to 7 bit
+  expressionPedalValue = constrain(map(expressionPedalValue, 0, 1023, 0, 127), 0, 127);
 
+  if (expressionPedalValue != expressionPedalLastValue) {
+    MIDI.sendControlChange(EXPRESSION_PEDAL_CC_NUMBER, expressionPedalValue, MIDI_CHANNEL);
+    expressionPedalLastValue = expressionPedalValue;
+  }
 }
 
 void printModeName() {
