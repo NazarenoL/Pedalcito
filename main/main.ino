@@ -64,8 +64,14 @@ const String MODES[] = {
   "Bajo2",
   "Bajo3",
   "Bajo4",
+  "Bajo5",
+  "Guitarra Overdrive 1",
+  "Guitarra Overdrive 2",
+  "Guitarra HiGain 1",
+  "Guitarra HiGain 2",
+  "Guitarra Acustica",
 };
-const byte MODES_COUNT = 4;
+const byte MODES_COUNT = 10;
 byte selectedMode = 0;
 
 // Creat a set of new characters
